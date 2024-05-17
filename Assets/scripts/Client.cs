@@ -9,13 +9,12 @@ using System.Text;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-public class PlayerMovement : MonoBehaviour
+public class Client : MonoBehaviour
 {
     private Rigidbody2D rb;
     Player player;
     Player my_player;
     bool connected = false;
-    bool is_host = false;
     //network vars
     public string ip = "";
     UdpClient udpc;
@@ -61,7 +60,14 @@ public class PlayerMovement : MonoBehaviour
                 {
                     my_player.jump = 1;
                 }
-
+                if (my_player.dirX > 0)
+                {
+                    my_player.rotation = 0;
+                }
+                else if (my_player.dirX < 0)
+                {
+                    my_player.rotation = 180;
+                }
                 // Data to send    
                 send = Serialize(my_player);
                 udpc.Send(send, send.Length);
@@ -71,11 +77,13 @@ public class PlayerMovement : MonoBehaviour
                     rdata = udpc.Receive(ref ep);
                     player = Deserialize(rdata);
                     rb = GameObject.Find("player" + player.id).GetComponent<Rigidbody2D>();
-                    //rb.transform.position = new Vector3(player.position[0], player.position[1], 0);
+                    rb.transform.position = new Vector3(player.position[0], player.position[1], 0);
+                    // rotate to side looking
+                    rb.transform.rotation = Quaternion.Euler(0, player.rotation, 0);
                     //Debug.Log(player.ToString());
-                    //if (player.jump == 1)
-                    //rb.velocity = new Vector2(rb.velocity.x, 13f);
-                    //rb.velocity = new Vector2(player.dirX * 7f, rb.velocity.y);
+                    if (player.jump == 1)
+                        rb.velocity = new Vector2(rb.velocity.x, 13f);
+                    rb.velocity = new Vector2(player.dirX * 7f, rb.velocity.y);
                 }
             }
         }
@@ -109,3 +117,4 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 }
+

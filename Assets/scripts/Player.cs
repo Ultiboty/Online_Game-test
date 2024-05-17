@@ -11,6 +11,7 @@ public class Player
     public int jump { get; set; }
     public float dirX { get; set; }
     public float[] position { get; set; }
+    public float rotation { get; set; }
     public Player(string address, int id)
     {
         this.address = address;
@@ -18,5 +19,6 @@ public class Player
         jump = 0;
         dirX = 0;
         position = new float[2] { 0, 0 };
+        rotation = 0;
     }
 }

@@ -9,13 +9,12 @@ using System.Text;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-public class PlayerMovement : MonoBehaviour
+public class Server_movement : MonoBehaviour
 {
     private Rigidbody2D rb;
     Player player;
     Player my_player;
     bool connected = false;
-    bool is_host = false;
     //network vars
     public string ip = "";
     UdpClient udpc;
@@ -61,7 +60,14 @@ public class PlayerMovement : MonoBehaviour
                 {
                     my_player.jump = 1;
                 }
-
+                if (my_player.dirX > 0)
+                {
+                    my_player.rotation = 0;
+                } 
+                else if (my_player.dirX < 0)
+                {
+                    my_player.rotation = 180;
+                }
                 // Data to send    
                 send = Serialize(my_player);
                 udpc.Send(send, send.Length);

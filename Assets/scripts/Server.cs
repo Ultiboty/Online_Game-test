@@ -14,7 +14,7 @@ using UnityEngine.Windows;
 using Debug = UnityEngine.Debug;
 
 
-public class PlayerManager : MonoBehaviour
+public class Server : MonoBehaviour
 {
     //game vars
     Player player;
@@ -68,7 +68,7 @@ public class PlayerManager : MonoBehaviour
                     {
                         // send the player that match the id
                         Debug.Log("sending again to player number: " + Addresses[address]);
-                        send = Serialize(Players[Addresses[address]-1]);
+                        send = Serialize(Players[Addresses[address] - 1]);
                         udpc.Send(send, send.Length, ep);
                     }
                     else
@@ -95,7 +95,9 @@ public class PlayerManager : MonoBehaviour
                     rb.velocity = new Vector2(rb.velocity.x, 13f);
                     Debug.Log(player.id + "has jumped: " + player.jump);
                 }
-                  
+                // rotate to side looking
+                rb.transform.rotation = Quaternion.Euler(0, player.rotation, 0);
+                // move horizontaly
                 rb.velocity = new Vector2(player.dirX * 7f, rb.velocity.y);
                 for (int i = 1; i < counter; i++)
                 {

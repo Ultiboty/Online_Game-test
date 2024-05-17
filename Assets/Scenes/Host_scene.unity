@@ -327,6 +327,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 664d2882693191a4d927fd03c8d58435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ip: 
 --- !u!61 &595296490
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -408,8 +409,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 898569907}
-  - component: {fileID: 898569908}
   - component: {fileID: 898569909}
+  - component: {fileID: 898569908}
   m_Layer: 0
   m_Name: PlayerManager
   m_TagString: Untagged
@@ -443,7 +444,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 898569906}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f957605e8fc092d439135448530d2e1b, type: 3}
+  m_Script: {fileID: 11500000, guid: 767e1b47047d7c54286bff76754cbac3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &898569909
@@ -455,9 +456,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 898569906}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 664d2882693191a4d927fd03c8d58435, type: 3}
+  m_Script: {fileID: 11500000, guid: 01cdc1cc2e6cbb6488940afe029869ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ip: 
 --- !u!1 &1054020013
 GameObject:
   m_ObjectHideFlags: 0
@@ -3615,6 +3617,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 664d2882693191a4d927fd03c8d58435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ip: 
 --- !u!50 &2105192574
 Rigidbody2D:
   serializedVersion: 4
