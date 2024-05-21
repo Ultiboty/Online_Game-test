@@ -100,8 +100,8 @@ public class Client : MonoBehaviour
         rb.velocity = new Vector2(player.dirX * 7f, rb.velocity.y);
 
         // running animation
-        anim = GameObject.Find("player" + player.id).GetComponent<Animator>();
-        anim.SetBool("running" + player.id, player.dirX != 0);
+        //anim = GameObject.Find("player" + player.id).GetComponent<Animator>();
+        //anim.SetBool("running" + player.id, player.dirX != 0);
     }
     void GetInput()
     {
