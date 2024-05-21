@@ -12,7 +12,6 @@ using Debug = UnityEngine.Debug;
 public class Server_movement : MonoBehaviour
 {
     private Rigidbody2D rb;
-    Player player;
     Player my_player;
     bool connected = false;
     //network vars
@@ -52,37 +51,11 @@ public class Server_movement : MonoBehaviour
                 }
             }
             else
-            {
-                // get movement info
-                my_player.dirX = Input.GetAxis("Horizontal");
-                my_player.jump = 0;
-                if (Input.GetButtonDown("Jump"))
-                {
-                    my_player.jump = 1;
-                }
-                if (my_player.dirX > 0)
-                {
-                    my_player.rotation = 0;
-                } 
-                else if (my_player.dirX < 0)
-                {
-                    my_player.rotation = 180;
-                }
-                // Data to send    
+            { 
+                GetInput();
+                // send data
                 send = Serialize(my_player);
                 udpc.Send(send, send.Length);
-                while (udpc.Available > 0)
-                {
-                    // received Data
-                    rdata = udpc.Receive(ref ep);
-                    player = Deserialize(rdata);
-                    rb = GameObject.Find("player" + player.id).GetComponent<Rigidbody2D>();
-                    //rb.transform.position = new Vector3(player.position[0], player.position[1], 0);
-                    //Debug.Log(player.ToString());
-                    //if (player.jump == 1)
-                    //rb.velocity = new Vector2(rb.velocity.x, 13f);
-                    //rb.velocity = new Vector2(player.dirX * 7f, rb.velocity.y);
-                }
             }
         }
         catch (Exception e)
@@ -94,6 +67,28 @@ public class Server_movement : MonoBehaviour
             // Get the line number from the stack frame
             var line = frame.GetFileLineNumber();
             Debug.LogError(e.Message + line);
+        }
+    }
+    void GetInput()
+    {
+        // get horizontal movement
+        my_player.dirX = Input.GetAxis("Horizontal");
+
+        // get jump
+        my_player.jump = 0;
+        if (Input.GetButtonDown("Jump"))
+        {
+            my_player.jump = 1;
+        }
+
+        // get side to look
+        if (my_player.dirX > 0)
+        {
+            my_player.rotation = 0;
+        }
+        else if (my_player.dirX < 0)
+        {
+            my_player.rotation = 180;
         }
     }
     static byte[] Serialize(object obj)

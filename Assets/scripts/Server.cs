@@ -29,7 +29,7 @@ public class Server : MonoBehaviour
     byte[] receivedData;
     string received;
     byte[] send;
-
+    Animator anim;
     void Start()
     {
         Application.targetFrameRate = 60;
@@ -39,6 +39,10 @@ public class Server : MonoBehaviour
         udpc = new UdpClient(7878);
         Debug.Log("Server Started and servicing on port no. 7878");
         ep = null;
+        //for (int i = 1; i < 5; i++)
+        //{
+        //    GameObject.Find("player" + i).SetActive(false);
+        //}
     }
 
 
@@ -66,19 +70,11 @@ public class Server : MonoBehaviour
                 {
                     if (Addresses.ContainsKey(address))
                     {
-                        // send the player that match the id
-                        Debug.Log("sending again to player number: " + Addresses[address]);
-                        send = Serialize(Players[Addresses[address] - 1]);
-                        udpc.Send(send, send.Length, ep);
+                        SendAgain();
                     }
                     else
                     {
-                        Addresses.Add(address, counter);
-                        Players[counter - 1] = new Player(address, counter);
-                        Debug.Log("connection from: " + address + "    assigned player number: " + counter);
-                        send = Serialize(Players[counter - 1]);
-                        udpc.Send(send, send.Length, ep);
-                        counter++;
+                        AddPlayer();
                     }
                     return;
                 }
@@ -89,21 +85,11 @@ public class Server : MonoBehaviour
                 player.position[0] = rb.transform.position.x;
                 player.position[1] = rb.transform.position.y;
                 Players[player.id - 1] = player;
-                //Debug.Log("player " + player.id + " from address: " + player.address);
-                if (player.jump == 1)
-                {
-                    rb.velocity = new Vector2(rb.velocity.x, 13f);
-                    Debug.Log(player.id + "has jumped: " + player.jump);
-                }
-                // rotate to side looking
-                rb.transform.rotation = Quaternion.Euler(0, player.rotation, 0);
-                // move horizontaly
-                rb.velocity = new Vector2(player.dirX * 7f, rb.velocity.y);
+                MovePlayer();
+
+                // send all players to client
                 for (int i = 1; i < counter; i++)
                 {
-                    //Debug.Log(Players[i].jump);
-                    //Debug.Log(Players[i].dirX);
-                    Debug.Log(i);
                     send = Serialize(Players[i - 1]);
                     udpc.Send(send, send.Length, ep);
                 }
@@ -121,6 +107,43 @@ public class Server : MonoBehaviour
             var line = frame.GetFileLineNumber();
             Debug.LogError(e.Message + line);
         }
+    }
+    void MovePlayer()
+    {
+        // jump
+        if (player.jump == 1)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, 13f);
+            Debug.Log(player.id + "has jumped: " + player.jump);
+        }
+
+        // rotate to side looking
+        rb.transform.rotation = Quaternion.Euler(0, player.rotation, 0);
+
+        // move horizontaly
+        rb.velocity = new Vector2(player.dirX * 7f, rb.velocity.y);
+
+        // set animation
+        anim = GameObject.Find("player" + player.id).GetComponent<Animator>();
+        anim.SetBool("running", player.dirX != 0);
+        anim.SetBool("jump", player.jump != 0);
+    }
+    void AddPlayer()
+    {
+        //GameObject.Find("player" + counter).SetActive(true);
+        Addresses.Add(address, counter);
+        Players[counter - 1] = new Player(address, counter);
+        Debug.Log("connection from: " + address + "    assigned player number: " + counter);
+        send = Serialize(Players[counter - 1]);
+        udpc.Send(send, send.Length, ep);
+        counter++;
+    }
+    void SendAgain()
+    {
+        // send the player that match the id
+        Debug.Log("sending again to player number: " + Addresses[address]);
+        send = Serialize(Players[Addresses[address] - 1]);
+        udpc.Send(send, send.Length, ep);
     }
     static byte[] Serialize(object obj)
     {
