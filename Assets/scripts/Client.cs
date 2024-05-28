@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using Unity.VisualScripting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -23,12 +24,14 @@ public class Client : MonoBehaviour
     byte[] rdata;
     string bp;
     Animator anim;
+    int fail_count;
     // Start is called before the first frame update
     void Start()
     {
         Application.targetFrameRate = 60;
-        udpc = new UdpClient("192.168.1.154", 7878);
+        udpc = new UdpClient(Login_info.ip, 7878);
         ep = null;
+        fail_count = 0;
     }
 
     // Update is called once per frame
@@ -40,15 +43,15 @@ public class Client : MonoBehaviour
             {
                 if (udpc.Available > 0)
                 {
-                    // received Data
-                    rdata = udpc.Receive(ref ep);
-                    my_player = Deserialize(rdata);
-                    connected = true;
+                    connected = ReceiveData(); 
+                    if (connected)
+                        my_player = Deserialize(rdata);
                 }
                 else
                 {
                     send = Encoding.ASCII.GetBytes("hello");
                     udpc.Send(send, send.Length);
+                    
                 }
             }
             else
@@ -77,10 +80,31 @@ public class Client : MonoBehaviour
             Debug.LogError(e.Message + line);
         }
     }
+    bool ReceiveData()
+    {
+        if (fail_count > 210) // 420 with 60 fps is 7 secs, but we need to account for the fact that we send connection, then check the respond, so 2 iterations for 1 msg.
+        {
+            Debug.LogError("error reaching the server for 7 sec");
+            UnityEditor.EditorApplication.isPlaying = false;
+        }
+        try
+        {
+            rdata = udpc.Receive(ref ep);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("error connecting to the server, error: " + e.Message);
+            fail_count++;
+            return false;
+        }
+        fail_count = 0;
+        return true;
+    }
     void HandlePlayer()
     {
         // receive Data
-        rdata = udpc.Receive(ref ep);
+        if (!ReceiveData())
+            return;
         player = Deserialize(rdata);
 
         // find player

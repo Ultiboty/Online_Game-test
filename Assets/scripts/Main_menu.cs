@@ -9,11 +9,6 @@ public class Main_menu : MonoBehaviour
     {
         SceneManager.LoadScene("Host_scene");
     }
-    public void JoinGame()
-    {
-
-        SceneManager.LoadScene("Client_scene");
-    }
     public void QuitGame()
     {
         UnityEditor.EditorApplication.isPlaying = false;

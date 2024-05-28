@@ -21,7 +21,7 @@ public class Server : MonoBehaviour
     private Rigidbody2D rb;
     //network vars
     Player[] Players;
-    IDictionary<string, int> Addresses;
+    IDictionary<IPEndPoint, int> Addresses;
     int counter;
     string address;
     UdpClient udpc;
@@ -33,15 +33,15 @@ public class Server : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 60;
-        Players = new Player[4];
-        Addresses = new Dictionary<string, int>();
-        counter = 1;
-        udpc = new UdpClient(7878);
-        Debug.Log("Server Started and servicing on port no. 7878");
+        Players = Login_info.Players;
+        Addresses = Login_info.Addresses;
+        counter = Login_info.counter;
+        udpc = Login_info.udpc;
+        Debug.Log("started playing");
         ep = null;
-        //for (int i = 1; i < 5; i++)
+        //for (int i = 1; i < counter; i++)
         //{
-        //    GameObject.Find("player" + i).SetActive(false);
+            //GameObject.Find("player" + player.id).SetActive(true);
         //}
     }
 
@@ -62,23 +62,7 @@ public class Server : MonoBehaviour
                 {
                     Debug.Log(e);
                 }
-                address = ep.Address.ToString() + " " + ep.Port.ToString();
-                //Debug.Log("received:" + Encoding.ASCII.GetString(receivedData));
-
-                // if asking player, give
-                if (received == "hello")
-                {
-                    if (Addresses.ContainsKey(address))
-                    {
-                        SendAgain();
-                    }
-                    else
-                    {
-                        AddPlayer();
-                    }
-                    return;
-                }
-
+             
                 //move based on data
                 player = Deserialize(receivedData);
                 rb = GameObject.Find("player" + player.id).GetComponent<Rigidbody2D>();
@@ -127,23 +111,6 @@ public class Server : MonoBehaviour
         //anim = GameObject.Find("player" + player.id).GetComponent<Animator>();
         //anim.SetBool("running", player.dirX != 0);
         //anim.SetBool("jump", player.jump != 0);
-    }
-    void AddPlayer()
-    {
-        //GameObject.Find("player" + counter).SetActive(true);
-        Addresses.Add(address, counter);
-        Players[counter - 1] = new Player(address, counter);
-        Debug.Log("connection from: " + address + "    assigned player number: " + counter);
-        send = Serialize(Players[counter - 1]);
-        udpc.Send(send, send.Length, ep);
-        counter++;
-    }
-    void SendAgain()
-    {
-        // send the player that match the id
-        Debug.Log("sending again to player number: " + Addresses[address]);
-        send = Serialize(Players[Addresses[address] - 1]);
-        udpc.Send(send, send.Length, ep);
     }
     static byte[] Serialize(object obj)
     {

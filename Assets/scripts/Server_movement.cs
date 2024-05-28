@@ -25,8 +25,9 @@ public class Server_movement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        my_player = Login_info.host_Player;
         Application.targetFrameRate = 60;
-        udpc = new UdpClient("192.168.1.154", 7878);
+        udpc = Login_info.host_udpc;
         ep = null;
     }
 
@@ -34,29 +35,12 @@ public class Server_movement : MonoBehaviour
     void Update()
     {
         try
-        {
-            if (!connected)
-            {
-                if (udpc.Available > 0)
-                {
-                    // received Data
-                    rdata = udpc.Receive(ref ep);
-                    my_player = Deserialize(rdata);
-                    connected = true;
-                }
-                else
-                {
-                    send = Encoding.ASCII.GetBytes("hello");
-                    udpc.Send(send, send.Length);
-                }
-            }
-            else
-            { 
-                GetInput();
-                // send data
-                send = Serialize(my_player);
-                udpc.Send(send, send.Length);
-            }
+        { 
+            GetInput();
+            // send data
+            send = Serialize(my_player);
+            udpc.Send(send, send.Length);
+           
         }
         catch (Exception e)
         {
