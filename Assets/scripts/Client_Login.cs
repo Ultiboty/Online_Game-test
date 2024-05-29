@@ -6,11 +6,15 @@ using UnityEngine;
 using System.Text;
 using System;
 using UnityEngine.SceneManagement;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 
 public class Client_Login : MonoBehaviour
 {
     UdpClient udpc;
     IPEndPoint ep;
+    Player player;
     bool start_connect = false;
     bool connected = false;
     byte[] rdata;
@@ -28,13 +32,11 @@ public class Client_Login : MonoBehaviour
     void Update()
     {
         // try connecting to the server
-        if (start_connect)
+        if (start_connect && !connected)
         {
             if (udpc.Available > 0)
             {
                 connected = ReceiveData("hello");
-                if (connected)
-                    start_connect = false;
             }
             else
             {
@@ -44,7 +46,7 @@ public class Client_Login : MonoBehaviour
             }
         }
         // check if info was entered
-        else if (Login_info.ip != null && Login_info.password != null)
+        if (Login_info.ip != null && Login_info.password != null && !start_connect)
         {
             Debug.Log("got info");
             start_connect = true;
@@ -54,10 +56,18 @@ public class Client_Login : MonoBehaviour
         // wait for the server start msg
         if (connected && udpc.Available > 0)
         {
-            if (ReceiveData("start"))
+            try
             {
-                SceneManager.LoadScene("Client_Scene");
+                rdata = udpc.Receive(ref ep);
+                player = Deserialize(rdata);
             }
+            catch (Exception e)
+            {
+                return;
+            }
+            Login_info.client_Player = player;
+            Login_info.Client_udpc = udpc;
+            SceneManager.LoadScene("Client_Scene");
         }
     }
     bool ReceiveData(string check)
@@ -84,5 +94,13 @@ public class Client_Login : MonoBehaviour
         }
         fail_count = 0;
         return true;
+    }
+    static Player Deserialize(byte[] data)
+    {
+        using (MemoryStream memoryStream = new MemoryStream(data))
+        {
+            IFormatter formatter = new BinaryFormatter();
+            return (Player)formatter.Deserialize(memoryStream);
+        }
     }
 }

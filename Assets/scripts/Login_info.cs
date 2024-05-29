@@ -13,5 +13,7 @@ public static class Login_info
     public static int counter { get; set; }
     public static UdpClient udpc { get; set; }
     public static UdpClient host_udpc { get; set; }
+    public static UdpClient Client_udpc { get; set; }
+    public static Player client_Player { get; set; }
     public static Player host_Player { get; set; }
 }

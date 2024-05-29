@@ -8,6 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 using Debug = UnityEngine.Debug;
 
 public class Client : MonoBehaviour
@@ -29,9 +30,14 @@ public class Client : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 60;
-        udpc = new UdpClient(Login_info.ip, 7878);
+        udpc = Login_info.Client_udpc;
         ep = null;
         fail_count = 0;
+        my_player = Login_info.client_Player;
+        for (int i = 4; i > my_player.counter - 1; i--)
+        {
+            GameObject.Find("player" + i).SetActive(false);
+        }
     }
 
     // Update is called once per frame
@@ -39,35 +45,18 @@ public class Client : MonoBehaviour
     {
         try
         {
-            if (!connected)
-            {
-                if (udpc.Available > 0)
-                {
-                    connected = ReceiveData(); 
-                    if (connected)
-                        my_player = Deserialize(rdata);
-                }
-                else
-                {
-                    send = Encoding.ASCII.GetBytes("hello");
-                    udpc.Send(send, send.Length);
-                    
-                }
-            }
-            else
-            {
-                GetInput();
+            GetInput();
 
-                // send data
-                send = Serialize(my_player);
-                udpc.Send(send, send.Length);
+            // send data
+            send = Serialize(my_player);
+            udpc.Send(send, send.Length);
 
-                // for each player sent to us, move
-                while (udpc.Available > 0)
-                {
-                    HandlePlayer();
-                }
+            // for each player sent to us, move
+            while (udpc.Available > 0)
+            {
+                HandlePlayer();
             }
+            
         }
         catch (Exception e)
         {

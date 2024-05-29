@@ -2,8 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -28,7 +31,8 @@ public class Server_Login : MonoBehaviour
     void Start()
     {
         System.Random rnd =new System.Random();
-        password = rnd.Next(100000, 1000000);
+        password = 123456;
+        //password = rnd.Next(100000, 1000000);
         Application.targetFrameRate = 60;
         Players = new Player[4];
         Addresses = new Dictionary<IPEndPoint, int>();
@@ -149,15 +153,25 @@ public class Server_Login : MonoBehaviour
         Login_info.host_Player = Players[0];
         // send start message
         Debug.Log("starting server");
-        send = Encoding.ASCII.GetBytes("hello");
         for (int j=0;j < 10; j++)
         {
             for (int i = 1; i < counter; i++)
             {
-                udpc.Send(send, send.Length, Players[i - 1].ep);
+                Players[i - 1].counter = counter;
+                send = Serialize(Players[i - 1]);
+                udpc.Send(send, send.Length, Players[i-1].ep);
             }
         }
         SceneManager.LoadScene("Host_Scene");
+    }
+    static byte[] Serialize(object obj)
+    {
+        using (MemoryStream memoryStream = new MemoryStream())
+        {
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(memoryStream, obj);
+            return memoryStream.ToArray();
+        }
     }
 }
 

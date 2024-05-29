@@ -39,10 +39,10 @@ public class Server : MonoBehaviour
         udpc = Login_info.udpc;
         Debug.Log("started playing");
         ep = null;
-        //for (int i = 1; i < counter; i++)
-        //{
-            //GameObject.Find("player" + player.id).SetActive(true);
-        //}
+        for (int i = 4; i > counter-1; i--)
+        {
+            GameObject.Find("player" + i).SetActive(false);
+        }
     }
 
 

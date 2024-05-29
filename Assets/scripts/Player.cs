@@ -9,6 +9,7 @@ public class Player
 {
     public IPEndPoint ep { get; set; }
     public int id { get; set; }
+    public int counter { get; set; }
     public int jump { get; set; }
     public float dirX { get; set; }
     public float[] position { get; set; }
