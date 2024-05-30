@@ -108,8 +108,8 @@ public class Server : MonoBehaviour
         rb.velocity = new Vector2(player.dirX * 7f, rb.velocity.y);
 
         // set animation
-        //anim = GameObject.Find("player" + player.id).GetComponent<Animator>();
-        //anim.SetBool("running", player.dirX != 0);
+        anim = GameObject.Find("player" + player.id).GetComponent<Animator>();
+        anim.SetBool("running", player.dirX != 0);
         //anim.SetBool("jump", player.jump != 0);
     }
     static byte[] Serialize(object obj)

@@ -37,11 +37,11 @@ public class Server_Login : MonoBehaviour
         Players = new Player[4];
         Addresses = new Dictionary<IPEndPoint, int>();
         counter = 1;
-        udpc = new UdpClient(7878);
+        udpc = new UdpClient(20000);
         Debug.Log("Server Started and servicing on port no. 7878");
         ep = null;
         ep2 = null;
-        host_udpc = new UdpClient("127.0.0.1", 7878);
+        host_udpc = new UdpClient("127.0.0.1", 20000);
     }
 
     // Update is called once per frame

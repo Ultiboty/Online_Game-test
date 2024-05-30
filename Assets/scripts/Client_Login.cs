@@ -50,7 +50,7 @@ public class Client_Login : MonoBehaviour
         {
             Debug.Log("got info");
             start_connect = true;
-            udpc = new UdpClient(Login_info.ip, 7878);
+            udpc = new UdpClient(Login_info.ip, 20000);
             ep = null;
         }
         // wait for the server start msg
@@ -66,6 +66,7 @@ public class Client_Login : MonoBehaviour
                 return;
             }
             Login_info.client_Player = player;
+            Login_info.counter = player.counter;
             Login_info.Client_udpc = udpc;
             SceneManager.LoadScene("Client_Scene");
         }
